@@ -202,9 +202,13 @@ module.exports = (opt = {}) ->
                   langResource[lang][tFileName][opt.specifyKey] + '.html'
                 )
               else
-                newFilePath = gutil.replaceExtension(
-                  newFilePath,
-                  seperator + langResource[lang][tFileName][opt.specifyKey] + '.html'
+                baseName = path.basename(newFilePath)
+                baseFileName = baseName.replace(/\.html?$/, '')
+                gutil.log(baseName)
+                gutil.log(baseFileName)
+                newFilePath = path.resolve(
+                  path.dirname(newFilePath),
+                  langResource[lang][tFileName][opt.specifyKey] + seperator + baseFileName + '.html'
                 )
             #
             # If the option `createLangDirs` is set, save path/foo.html
