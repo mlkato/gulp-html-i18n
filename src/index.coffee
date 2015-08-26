@@ -114,8 +114,9 @@ getLangResource = (->
           (filePath, cb) ->
             if path.extname(filePath) in supportedType
               filePath = path.resolve langDir, filePath
-              res[path.basename(filePath).replace(/\.js(on)?$/, '')] =
-                getResourceFile filePath
+              baseName = path.basename(filePath).replace(/\.js(on)?$/, '')
+              res[baseName] = getResourceFile filePath
+              res['templateFileName'] = baseName
             cb()
           (err) ->
             return reject err if err
@@ -168,7 +169,7 @@ module.exports = (opt = {}) ->
     throw new gutil.PluginError('gulp-html-i18n', 'Please specify langDir')
 
   langDir = path.resolve process.cwd(), opt.langDir
-  seperator = opt.seperator || '-'
+  seperator = opt.seperator || '_'
   through.obj (file, enc, next) ->
     if file.isNull()
       return @emit 'error',
@@ -191,11 +192,25 @@ module.exports = (opt = {}) ->
             originPath = file.path
             newFilePath = originPath.replace /\.src\.html$/, '\.html'
 
+
+            if opt.specifyKey?
+              tFileName = langResource[lang]['templateFileName']
+
+              if opt.replaceWithKey
+                newFilePath = path.resolve(
+                  path.dirname(newFilePath),
+                  langResource[lang][tFileName][opt.specifyKey] + '.html'
+                )
+              else
+                newFilePath = gutil.replaceExtension(
+                  newFilePath,
+                  seperator + langResource[lang][tFileName][opt.specifyKey] + '.html'
+                )
             #
             # If the option `createLangDirs` is set, save path/foo.html
             # to path/lang/foo.html. Otherwise, save to path/foo-lang.html
             #
-            if opt.createLangDirs
+            else if opt.createLangDirs
               newFilePath = path.resolve(
                 path.dirname(newFilePath),
                 lang,

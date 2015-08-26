@@ -35,6 +35,27 @@ gulp.task 'inline', ->
 # Demonstrates creating language specific subdirectories, rather than
 # creating suffixed files
 #
+gulp.task 'replaceName', ->
+  gulp.src('example/src/**/index.src.html')
+    .pipe i18n
+      specifyKey: 'outputFileName'
+      replaceWithKey: true
+      langDir: 'example/src/lang'
+      trace: true
+    .pipe gulp.dest('example/replace_name')
+
+gulp.task 'specifyName', ->
+  gulp.src('example/src/**/index.src.html')
+    .pipe i18n
+      specifyKey: 'outputFileName'
+      langDir: 'example/src/lang'
+      trace: true
+    .pipe gulp.dest('example/specify_name')
+
+#
+# Demonstrates creating language specific subdirectories, rather than
+# creating suffixed files
+#
 gulp.task 'dirs', ->
   gulp.src('example/src/**/index.src.html')
     .pipe i18n
