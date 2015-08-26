@@ -204,8 +204,6 @@ module.exports = (opt = {}) ->
               else
                 baseName = path.basename(newFilePath)
                 baseFileName = baseName.replace(/\.html?$/, '')
-                gutil.log(baseName)
-                gutil.log(baseFileName)
                 newFilePath = path.resolve(
                   path.dirname(newFilePath),
                   langResource[lang][tFileName][opt.specifyKey] + seperator + baseFileName + '.html'
