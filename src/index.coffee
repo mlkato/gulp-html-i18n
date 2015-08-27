@@ -132,6 +132,9 @@ getLangResource = (->
       res = LANG_LIST: []
       langList = fs.readdirSync dir
 
+      langList.sort (a, b) ->
+        return a - b
+
       # Only load the provided language if inline is defined
       if options.inline
         if fs.statSync(path.resolve dir, options.inline).isDirectory()
