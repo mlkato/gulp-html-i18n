@@ -219,7 +219,6 @@ module.exports = (opt = {}) ->
 
               if opt.replaceWithKey
 
-
                 newFilePath = path.resolve(
                   path.dirname(newFilePath),
                   langResource[lang][tFileName][opt.specifyKey] + '.html'
@@ -237,11 +236,21 @@ module.exports = (opt = {}) ->
             # to path/lang/foo.html. Otherwise, save to path/foo-lang.html
             #
             else if opt.createLangDirs
-              newFilePath = path.resolve(
-                path.dirname(newFilePath),
-                lang,
-                path.basename(newFilePath)
-              )
+              if opt.jade
+                baseName = path.basename(newFilePath)
+                baseFileName = baseName.replace(/\.html?$/, '')
+                baseFileName = baseName.replace(/\.jade?$/, '')
+                newFilePath = path.resolve(
+                  path.dirname(newFilePath),
+                  lang,
+                  path.basename(newFilePath).replace(/\.jade?$/, '.html')
+                )
+              else
+                newFilePath = path.resolve(
+                  path.dirname(newFilePath),
+                  lang,
+                  path.basename(newFilePath)
+                )
 
             #
             # If the option `inline` is set, replace the tags in the same source file,
