@@ -52,6 +52,18 @@ gulp.task 'specifyName', ->
       trace: true
     .pipe gulp.dest('example/specify_name')
 
+gulp.task 'jade', ->
+  gulp.src('example/src/**/index.jade')
+    .pipe i18n
+      langDir: 'example/src/lang',
+      jade: true,
+      jadeOpt: {
+        pretty: true
+      },
+      specifyKey: 'outputFileName',
+      replaceWithKey: true
+    .pipe gulp.dest('example/jade')
+
 #
 # Demonstrates creating language specific subdirectories, rather than
 # creating suffixed files

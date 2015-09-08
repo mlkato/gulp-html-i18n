@@ -4,6 +4,7 @@ path    = require 'path'
 async   = require 'async'
 gutil   = require 'gulp-util'
 through = require 'through2'
+jade = require 'jade'
 
 EOL           = '\n'
 options       = undefined
@@ -56,6 +57,15 @@ replaceProperties = (content, properties, lv) ->
       else
         res = replaceProperties res, properties, lv + 1
     res
+
+compileJade = (content, opts, locals) ->
+  if not locals
+    return content
+  _locals = locals
+  moment = require 'moment'
+  moment.locale('ja')
+  _locals.moment = moment
+  compiled = jade.compile(content, opts)(_locals)
 
 #
 # Load the definitions for all languages
@@ -185,7 +195,11 @@ module.exports = (opt = {}) ->
     getLangResource(langDir).then(
       (langResource) =>
         if file._lang_
-          content = replaceProperties file.contents.toString(),
+
+          if opt.jade
+            content = compileJade file.contents.toString(), opt.jadeOpt, langResource[file._lang_]
+          else
+            content = replaceProperties file.contents.toString(),
             langResource[file._lang_]
 
           file.contents = new Buffer content
@@ -193,13 +207,19 @@ module.exports = (opt = {}) ->
         else
           langResource.LANG_LIST.forEach (lang) =>
             originPath = file.path
-            newFilePath = originPath.replace /\.src\.html$/, '\.html'
+
+            if opt.jade
+              newFilePath = originPath.replace /\.src\.jade$/, '\.html'
+            else
+              newFilePath = originPath.replace /\.src\.html$/, '\.html'
 
 
             if opt.specifyKey?
               tFileName = langResource[lang]['templateFileName']
 
               if opt.replaceWithKey
+
+
                 newFilePath = path.resolve(
                   path.dirname(newFilePath),
                   langResource[lang][tFileName][opt.specifyKey] + '.html'
@@ -207,6 +227,7 @@ module.exports = (opt = {}) ->
               else
                 baseName = path.basename(newFilePath)
                 baseFileName = baseName.replace(/\.html?$/, '')
+                baseFileName = baseName.replace(/\.jade?$/, '')
                 newFilePath = path.resolve(
                   path.dirname(newFilePath),
                   langResource[lang][tFileName][opt.specifyKey] + seperator + baseFileName + '.html'
@@ -233,15 +254,20 @@ module.exports = (opt = {}) ->
                 newFilePath,
                 seperator + lang + '.html'
               )
-
-            content = replaceProperties file.contents.toString(),
+            if opt.jade
+              content = compileJade file.contents.toString(), opt.jadeOpt, langResource[lang]
+            else
+              content = replaceProperties file.contents.toString(),
               langResource[lang]
 
             if options.fallback
               console.log lang
               console.log content
-              content = replaceProperties content, langResource[options.fallback]
-              console.log content
+              if opt.jade
+                content = compileJade file.contents.toString(), opt.jadeOpt, langResource[options.fallback]
+              else
+                content = replaceProperties content, langResource[options.fallback]
+                console.log content
 
             if opt.trace
               tracePath = path.relative(process.cwd(), originPath)

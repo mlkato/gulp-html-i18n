@@ -3,5 +3,6 @@
   "msg": {
     "hello": "hey"
   },
+  "format_date": "2015-09-09 15:59:59",
   "outputFileName": "specifyNameTest"
 }
