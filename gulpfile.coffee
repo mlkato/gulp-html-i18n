@@ -52,6 +52,14 @@ gulp.task 'specifyName', ->
       trace: true
     .pipe gulp.dest('example/specify_name')
 
+gulp.task 'duplicate', ->
+  gulp.src('example/src/**/index.src.html')
+    .pipe i18n
+      duplicateWithKey: 'duplicate'
+      langDir: 'example/src/lang'
+      trace: true
+    .pipe gulp.dest('example/duplicate')
+
 gulp.task 'jade', ->
   gulp.src('example/src/**/index.jade')
     .pipe i18n

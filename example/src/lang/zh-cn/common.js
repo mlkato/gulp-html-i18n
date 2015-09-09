@@ -3,5 +3,6 @@ define({
 	msg: {
 		hello: '你好世界！'
 	},
-  outputFileName: 'testSpecifyName'
+  outputFileName: 'testSpecifyName',
+  duplicate: ['hoge', 'hogehoge', 'hogehogehoge']
 });

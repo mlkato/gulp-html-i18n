@@ -223,6 +223,7 @@ module.exports = (opt = {}) ->
                   path.dirname(newFilePath),
                   langResource[lang][tFileName][opt.specifyKey] + '.html'
                 )
+
               else
                 baseName = path.basename(newFilePath)
                 baseFileName = baseName.replace(/\.html?$/, '')
@@ -285,14 +286,32 @@ module.exports = (opt = {}) ->
                 content = content.replace /(<body[^>]*>)/i, '$1' + EOL + trace
               else
                 content = trace + EOL + content
-            newFile = new gutil.File
-              base: file.base
-              cwd: file.cwd
-              path: newFilePath
-              contents: new Buffer content
-            newFile._lang_ = lang
-            newFile._originPath_ = originPath
-            @push newFile
+
+            if opt.duplicateWithKey
+              tKey = langResource[lang]['templateFileName']
+              tFileNames = langResource[lang][tKey][opt.duplicateWithKey]
+              for value, idx in tFileNames
+                newFilePath = path.resolve(
+                  path.dirname(newFilePath),
+                  value + '.html'
+                )
+                newFile = new gutil.File
+                  base: file.base
+                  cwd: file.cwd
+                  path: newFilePath
+                  contents: new Buffer content
+                newFile._lang_ = lang
+                newFile._originPath_ = originPath
+                @push newFile
+            else
+              newFile = new gutil.File
+                base: file.base
+                cwd: file.cwd
+                path: newFilePath
+                contents: new Buffer content
+              newFile._lang_ = lang
+              newFile._originPath_ = originPath
+              @push newFile
         next()
       (err) =>
         @emit 'error', new gutil.PluginError('gulp-html-i18n', err)
